@@ -1,0 +1,172 @@
+//  Exam 21 Giugno 2022 (Coding Course)
+//  Tomassi Martin
+//  Done in 5 Febbraio 2023
+//  Done in about 2 Hours
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct agenti {             // Definizione della Stuttura agenti
+
+    char nome_cognome_agente[71];
+    char id_agente[11];
+    int n_clienti_agente;
+    struct appuntamenti *appuntamenti;
+    struct agenti *next;
+
+};
+
+struct appuntamenti {           // Definizione della Struttura appuntamenti
+
+    char id_cliente[11];
+    char id_agente[11];
+    char codice_richiesta_prestazione[16];
+    struct appuntamenti *next;
+
+};
+
+struct agente_nomi {            // Definizione della Struttura agente_nomi
+
+    char nome_cognome_agente[71];
+    char id_agente[11];
+
+};
+
+struct rank_agente {
+
+    char id[11];
+    int n_clienti;
+
+};
+
+struct agenti* leggi_appuntamenti(FILE *stream, struct agente_nomi id_nomi_agenti[100], struct agenti **head);      // Prototipo della Funzione per leggere il File appuntamenti.txt
+void stampa_agenti(struct agenti *head);            // Prototipo della Funzione per Stampare la Lista Agenti
+void premio_agente_anno(struct agenti *head);       // Prototipo della Funzione per stampare i 3 Agenti con Piú Richieste di Prestazione
+
+int main() {
+
+    struct agenti *head;                                                // Puntatore alla Lista Agenti
+    FILE *fp = fopen("...\\appuntamenti.txt", "r");     // Apro il Flusso verso il File appuntamenti.txt
+    struct agente_nomi id_nomi_agenti[100];                             // Array di 100 Strutture agente_nomi
+
+    head = leggi_appuntamenti(fp,id_nomi_agenti,&head);           // Funzione che Rilascia la Testa della Lista Agenti leggendo il file appuntamenti.txt
+    fclose(fp);                         // Chiusura del Flusso verso il File
+    stampa_agenti(head);                    // Stampa Lista Agenti
+    premio_agente_anno(head);                   // Migliori 3 Agenti con Piú richieste di prestazione
+
+    return 0;
+}
+
+struct agenti* leggi_appuntamenti(FILE *stream, struct agente_nomi id_nomi_agenti[100], struct agenti **head) {
+
+    char id_cliente[11];        // Array di Appoggio per id_cliente
+    char id_agente[11];         // Array di Appoggio per id_agente
+    char codice_richiesta_prestazione[16];          // Array di Appoggio per codice richiesta prestazione
+    int count;          // Variabile di Appoggio per Conteggio Appuntamenti per appuntamenti
+    struct agenti *temp; struct agenti *new; struct agenti *temp2;      // Puntatori temporanei a Struct Agenti
+    while (!feof(stream)) {
+
+        fscanf(stream,"%s", id_cliente);        // Lettura dal File appuntamenti.txt per ricavare i 3 dati e appoggiarli sui 3 array
+        fflush(stream);
+        fscanf(stream,"%s", id_agente);
+        fflush(stream);
+        fscanf(stream,"%s", codice_richiesta_prestazione);
+        fflush(stream);
+
+        for (int i = 0; i<100; i++) {                 // Ciclo per controllare il Vettore a Struct nomi agenti per ricavare nome_cognome_agenti e costruire la Lista Agenti
+
+            if (strcmp(id_agente,id_nomi_agenti[i].id_agente) == 0) {
+                if(*head==NULL) {               // Aggiungere Elemento a Lista Struct Agenti senza Elementi iniziali, aggiugendo i dati e appuntamenti della Struct Agenti
+                    *head = (struct agenti *) malloc(sizeof(struct agenti));
+                    if(*head == NULL) {
+                        exit(1);
+                    }
+                    temp=*head;
+                    temp->nome_cognome_agente = id_nomi_agenti[i].nome_cognome_agente;
+                    temp->id_agente = id_nomi_agenti[i].id_agente;
+                    temp->appuntamenti = (struct appuntamenti *) malloc(sizeof(struct appuntamenti));
+                    strcpy(temp->appuntamenti->id_cliente, id_cliente );
+                    strcpy(temp->appuntamenti->id_agente, head->id_agente);
+                    strcpy(temp->appuntamenti->codice_richiesta_prestazione, codice_richiesta_prestazione);
+                    temp2=temp->appuntamenti;
+                    while(temp2 != NULL) {
+                        temp2 = temp2->next;
+                        count++;
+                    }
+                    temp->n_clienti_agente = count;
+                    count = 0;
+                }
+                if(*head != NULL) {             // Aggiungere Elemento a Lista Struct Agenti giá con Elementi iniziali, aggiugendo i dati e appuntamenti della Struct Agenti
+                    temp=(*head);
+                    while(temp->next != NULL){
+                        temp=temp->next;
+                    }
+                    new = (struct agenti *) malloc(sizeof(struct agenti));
+                    temp->next = new;
+                    new = NULL;
+                }
+                temp->next->nome_cognome_agente = id_nomi_agenti[i].nome_cognome_agente;
+                temp->next->id_agente = id_nomi_agenti[i].id_agente;
+                temp->next->appuntamenti = (struct appuntamenti *) malloc(sizeof(struct appuntamenti));
+                strcpy(temp->next->appuntamenti->id_cliente, id_cliente );
+                strcpy(temp->next->appuntamenti->id_agente, head->id_agente);
+                strcpy(temp->next->appuntamenti->codice_richiesta_prestazione, codice_richiesta_prestazione);
+                temp2 = temp->next->appuntamenti;
+                while(temp2 != NULL) {
+                    temp2 = temp2->next;
+                    count++;
+                }
+                temp->next->n_clienti_agente = count;
+                count = 0;
+            }
+        }
+    }
+    return (*head);
+}
+
+void stampa_agenti(struct agenti *head) {       // Stampa Lista Struct Agenti utilizzando la Ricorsione
+
+    if ( head->next != NULL) {              // Ciclo per Controllare tutta la Lista
+
+        head = head->next;
+        stampa_agenti(head);
+
+    }
+    printf("Nome e Cognome Agente: %s \n Id Agente: %s \n Numero Clienti: %d \n", &(head->nome_cognome_agente), &(head->id_agente), &(head->n_clienti_agente)); // Stampa dati di ogni elem Struct Della Lista Agenti
+    return;
+}
+
+void premio_agente_anno(struct agenti *head) {
+
+    struct rank_agente *p1, *p2, *p3;                                       // Dichiaro e Alloco Dinamicamente 3 Puntatori che mi tengono le prime 3 Posizioni
+    p1 = (struct rank_agente*) malloc(sizeof(struct rank_agente));
+    p2 = (struct rank_agente*) malloc(sizeof(struct rank_agente));
+    p3 = (struct rank_agente*) malloc(sizeof(struct rank_agente));
+
+    head = p1;
+
+    while ( head != NULL) {                                 // Utilizzo un Ciclo per Leggere Tutta la Lista Agenti
+
+        if (head->n_clienti_agente > p3->n_clienti) {          // Agente con CLienti maggiori della attuale 3rd Posizione
+            if(head->n_clienti_agente > p2->n_clienti) {        // Agente con CLienti maggiori della attuale 2nd Posizione
+                if(head->n_clienti_agente > p1->n_clienti) {        // Agente con CLienti maggiori della attuale 1st Posizione
+                    p1->n_clienti = head->n_clienti_agente;         // Per ogni posizione, copio i dati dell'agente con attuale maggiori clienti
+                    strcpy(p1->id,head->id_agente);
+                    head = head->next; continue;                // Per ogni posizione, Sposto la Testa passata By Value e ritorno alla condizione del while.
+                }
+                p2->n_clienti = head->n_clienti_agente;
+                strcpy(p2->id,head->id_agente);
+                head = head->next; continue;
+            }
+            p3->n_clienti = head->n_clienti_agente;
+            strcpy(p3->id,head->id_agente);
+            head = head->next; continue;
+        }
+        head = head->next;              // Se non é maggiore di nessuna posizione, allora porto avanti la testa
+    }
+
+    printf(" 1st : %s \n 2nd : %s \n 3rd : %s \n", (p1->id),(p2->id), (p3->id));        // Stampo la Classifica
+    return;
+}
