@@ -5,6 +5,22 @@
 #include <conio.h>
 #include <time.h>
 
+/*  Domande.txt
+ *  Film di Christopher Nolan del 2020:
+ *  Qual e' la risposta alla domanda fondamentale sulla vita, l'universo e tutto quanto?
+ *  In che anno Cristoforo Colombo ha scoperto l'America?
+ *  In che anno e' finita la Seconda Guerra Mondiale?
+ *  In che anno e' caduto il muro di Berlino?
+ *  Anno in cui l'Italia entra in guerra durante la Prima Guerra Mondiale:
+ *  Risposte.txt
+ *  Tenet
+ *  42
+ *  1492
+ *  1945
+ *  1989
+ *  1915
+ */
+
 /*
  * --- TESTO DELL'ESERCIZIO ---
  * Si scriva un programma C, adeguatamente commentato, per la generazione di partite del "Gioco dell'oca"
