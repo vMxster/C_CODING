@@ -1,0 +1,86 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+
+struct studente{
+    int numeroMatricola;
+    char nome[20];
+};
+
+struct arr_stud{
+    struct studente **studenti;
+    int count;
+};
+
+int aggiungiStudente(struct arr_stud* stud, char *nome, int num){
+
+    int i = stud->count;
+
+    stud->count++;
+    stud->studenti = (struct studente**) realloc(stud->studenti, stud->count*sizeof(struct studente*));
+
+    stud->studenti[i] = (struct studente*) malloc(sizeof(struct studente));
+    strcpy(stud->studenti[i]->nome, nome);
+    stud->studenti[i]->numeroMatricola = num;
+
+    return i;
+}
+
+int main()
+{
+    struct arr_stud matStudenti;
+
+    matStudenti.studenti = (struct studente **)malloc(sizeof(struct studente*));
+    matStudenti.count = 0;
+
+    matStudenti.studenti[0] = NULL;
+
+    int status;
+    char nome[20];
+    int num;
+    bool run = true;
+    int scelta;
+
+    while(run){
+        system("cls");
+        printf("[1]Inserisci matricola [2]stampa [3]esci\n\n->");
+        rewind(stdin);
+        scanf("%d", &scelta);
+
+        switch(scelta){
+            case 1:
+                system("cls");
+                printf("inserisci il nome: ");
+                rewind(stdin);
+                gets(nome);
+
+                printf("\nInserisci il numero matricola: ");
+                rewind(stdin);
+                scanf("%d", &num);
+
+                status = aggiungiStudente(&matStudenti, nome, num);
+
+                printf("\nMatricola inserita con successo n. %d\n\n", status);
+                break;
+            case 2:
+                system("cls");
+                printf("\n\nRisultato:\n\n");
+
+                for(int i=0; i<matStudenti.count; i++){
+                    if(matStudenti.studenti[i] != NULL){
+                        printf("Nome: %s, Num: %d\n\n\n", matStudenti.studenti[i]->nome, matStudenti.studenti[i]->numeroMatricola);
+                    }
+                }
+                break;
+            case 3:
+                run = false;
+                break;
+            default:
+                system("cls");
+                printf("\ninput errato\n");
+        }
+        system("pause");
+    }
+    return 0;
+}
